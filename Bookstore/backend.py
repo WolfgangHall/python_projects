@@ -1,0 +1,55 @@
+import sqlite3
+
+DB = "books.db"
+
+def connect():
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY, title TEXT, author TEXT, year INTEGER, isbn INTEGER)")
+    conn.commit()
+    conn.close()
+
+def insert(title, author, year, isbn):
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    # leave null for auto increment value
+    cur.execute("INSERT INTO book VALUES (NULL, ?, ?, ?, ?)", (title, author, year, isbn))
+    conn.commit()
+    conn.close()
+
+def view():
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM book")
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+def search(title="", author="", year="", isbn=""):
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM book WHERE title=? OR author=? OR year=? or isbn=?", (title, author, year, isbn))
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+def delete(id):
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    # need comma for single argument
+    cur.execute("DELETE FROM book WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+
+def update(id, title, author, year, isbn):
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    cur.execute("UPDATE book SET title=?, author=?, year=?, isbn=? WHERE id=?", (title, author, year, isbn, id))
+    conn.commit()
+    conn.close()
+
+
+# will execute anytime you run backend as an import
+connect()
+update(1, "The Moon", "John Smith", 1946, 12312312436)
+print(view())
